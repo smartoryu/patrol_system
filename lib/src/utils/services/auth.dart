@@ -17,7 +17,7 @@ class AuthService {
   // sign in anon
   Future<UserModel?> signInAnon() async {
     try {
-      UserCredential result = await _auth.signInAnonymously();
+      var result = await _auth.signInAnonymously();
       User? user = result.user;
       return _userFromFirebase(user);
     } catch (e) {
@@ -27,8 +27,38 @@ class AuthService {
   }
 
   // sign in with email & password
+  Future<UserModel?> signInWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      var result = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      User? user = result.user;
+      return _userFromFirebase(user);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   // register with email & password
+  Future<UserModel?> registerWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    try {
+      var result = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      User? user = result.user;
+      return _userFromFirebase(user);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
   // sign out
   Future<void> signOut() async {

@@ -16,11 +16,22 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   String email = "";
+  String password = "";
   bool isVisible = false;
   String? errorEmail;
   String? errorPass;
+  String error = "";
+  bool isLoading = false;
 
   void togglePass() => setState(() => isVisible = !isVisible);
+  void requestStart() => setState(() {
+        error = "";
+        isLoading = true;
+      });
+  void requestFailed(String e) => setState(() {
+        error = e;
+        isLoading = false;
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -70,18 +81,21 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             validator: (value) {
                               // The validator receives the text that the user has entered.
-                              // if (value == null || value.isEmpty) {
-                              //   return 'Email tidak boleh kosong';
-                              // }
-                              if (value != "admin@mail.com" &&
-                                  value != "user@mail.com") {
-                                return 'Hanya admin@mail.com atau user@mail.com';
+                              if (value == null || value.isEmpty) {
+                                return 'Email tidak boleh kosong';
                               }
+                              // if (value != "admin@mail.com" &&
+                              //     value != "user@mail.com") {
+                              //   return 'Hanya admin@mail.com atau user@mail.com';
+                              // }
                               return null;
                             },
                           ),
                           const SizedBox(height: 24),
                           TextFormField(
+                            onChanged: (value) {
+                              setState(() => this.password = value);
+                            },
                             decoration: InputDecoration(
                               border: const OutlineInputBorder(),
                               hintText: 'Password',
@@ -99,13 +113,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
-                            // validator: (value) {
-                            // The validator receives the text that the user has entered.
-                            // if (value == null || value.isEmpty) {
-                            //   return 'Password tidak boleh kosong';
-                            // }
-                            //   return null;
-                            // },
+                            validator: (value) {
+                              // The validator receives the text that the user has entered.
+                              if (value == null || value.isEmpty) {
+                                return 'Password tidak boleh kosong';
+                              }
+                              return null;
+                            },
                           ),
                         ],
                       ),
@@ -114,31 +128,59 @@ class _LoginScreenState extends State<LoginScreen> {
                     MyButton(
                       "Login",
                       onTap: () async {
-                        var result = await _auth.signInAnon();
+                        try {
+                          requestStart();
+                          // var result = await _auth.signInAnon();
+                          var result = await _auth.signInWithEmailAndPassword(
+                            this.email,
+                            this.password,
+                          );
 
-                        if (result == null) {
-                          debugPrint("erorr signing in");
-                        } else {
-                          debugPrint("signed in");
-                          print(result);
-                        }
+                          if (result == null) {
+                            debugPrint("erorr signing in");
+                          } else {
+                            debugPrint("signed in");
+                            print(result);
+                          }
 
-                        _formKey.currentState!.validate();
+                          _formKey.currentState!.validate();
 
-                        if (this.email == "admin@mail.com") {
-                          Navigator.pushNamed(context, HomeAdminScreen.route);
-                        } else if (this.email == "user@mail.com") {
-                          Navigator.pushNamed(context, HomeUserScreen.route);
+                          if (this.email == "admin@mail.com") {
+                            Navigator.pushNamed(context, HomeAdminScreen.route);
+                          } else if (this.email == "user@mail.com") {
+                            Navigator.pushNamed(context, HomeUserScreen.route);
+                          }
+                        } catch (e) {
+                          String errMsg = e.toString();
+                          print(errMsg);
+                          if (errMsg.contains("user-disabled")) {
+                            requestFailed("Account Disabled");
+                          } else if (errMsg.contains("wrong-password")) {
+                            requestFailed("Wrong Password");
+                          } else if (errMsg.contains("user-not-found")) {
+                            requestFailed("Email not registered");
+                          } else {
+                            requestFailed("Server Failed");
+                          }
                         }
                       },
                       childAlign: MainAxisAlignment.spaceBetween,
                       iconPrefix: const SizedBox(width: 20),
                       iconSuffix: SizedBox(
                         width: 20,
-                        child:
-                            Icon(Icons.arrow_forward, size: 20, color: kWhite),
+                        child: Icon(
+                          Icons.arrow_forward,
+                          size: 20,
+                          color: kWhite,
+                        ),
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    Text(
+                      error,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: kDanger, fontSize: 12),
+                    )
                   ],
                 ),
               ),
