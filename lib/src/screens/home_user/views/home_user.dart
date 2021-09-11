@@ -6,7 +6,7 @@ import 'components/task_item.dart';
 
 class HomeUserScreen extends StatefulWidget {
   static const route = "/home-user-screen";
-  HomeUserScreen({Key? key}) : super(key: key);
+  const HomeUserScreen({Key? key}) : super(key: key);
 
   @override
   _HomeUserScreenState createState() => _HomeUserScreenState();

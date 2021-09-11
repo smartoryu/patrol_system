@@ -13,6 +13,9 @@ export 'package:url_launcher/url_launcher.dart';
 export "constants/_index.dart";
 export "utils/_index.dart";
 
+// =============== SPLASH ===============
+export "screens/splash/views/splash.dart";
+
 // =============== LOGIN ===============
 export "screens/login/views/login.dart";
 

@@ -1,14 +1,18 @@
+// ignore_for_file: unnecessary_this, avoid_print
+
 import 'package:nusalima_patrol_system/src/views.dart';
 
 class LoginScreen extends StatefulWidget {
   static const route = "/login-screen";
-  LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final AuthService _auth = AuthService();
+
   final _formKey = GlobalKey<FormState>();
 
   String email = "";
@@ -16,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String? errorEmail;
   String? errorPass;
 
-  void togglePass() => setState(() => this.isVisible = !this.isVisible);
+  void togglePass() => setState(() => isVisible = !isVisible);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
         appBar: myAppBarMinimal(),
         backgroundColor: kWhite,
         body: CustomScrollView(
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
               child: Padding(
@@ -45,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: kPrimary,
                           ),
                     ),
-                    SizedBox(height: 60),
+                    const SizedBox(height: 60),
                     Form(
                       key: _formKey,
                       child: Column(
@@ -55,9 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               setState(() => this.email = value);
                             },
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                               isDense: true,
-                              contentPadding: EdgeInsets.symmetric(
+                              contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 16,
                               ),
@@ -76,10 +80,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               return null;
                             },
                           ),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                           TextFormField(
                             decoration: InputDecoration(
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                               hintText: 'Password',
                               errorText: this.errorPass,
                               suffixIcon: GestureDetector(
@@ -106,10 +110,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 24),
+                    const SizedBox(height: 24),
                     MyButton(
                       "Login",
-                      onTap: () {
+                      onTap: () async {
+                        var result = await _auth.signInAnon();
+
+                        if (result == null) {
+                          debugPrint("erorr signing in");
+                        } else {
+                          debugPrint("signed in");
+                          print(result);
+                        }
+
                         _formKey.currentState!.validate();
 
                         if (this.email == "admin@mail.com") {
@@ -119,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         }
                       },
                       childAlign: MainAxisAlignment.spaceBetween,
-                      iconPrefix: SizedBox(width: 20),
+                      iconPrefix: const SizedBox(width: 20),
                       iconSuffix: SizedBox(
                         width: 20,
                         child:

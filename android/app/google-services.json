@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "670853370271",
+    "project_id": "nusalima-patrol-system",
+    "storage_bucket": "nusalima-patrol-system.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:670853370271:android:ec68c1552290956625edaa",
+        "android_client_info": {
+          "package_name": "com.ptpn5.nusalima_patrol_system"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "670853370271-k6be6nnn5rjhq9lqr22as1di6jh964au.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxK0e2_zXd3RFGZRgpL-hWnZxaXTMnyzA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "670853370271-k6be6nnn5rjhq9lqr22as1di6jh964au.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

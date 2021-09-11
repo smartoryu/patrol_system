@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:nusalima_patrol_system/src/views.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -15,16 +17,19 @@ class MyApp extends AppMVC {
     return MaterialApp(
       theme: ThemeData(fontFamily: 'OpenSans'),
       debugShowCheckedModeBanner: false,
-      initialRoute: LoginScreen.route,
+      initialRoute: SplashScreen.route,
       routes: {
+        // splash
+        SplashScreen.route: (context) => const SplashScreen(),
+
         // login
-        LoginScreen.route: (context) => LoginScreen(),
+        LoginScreen.route: (context) => const LoginScreen(),
 
         // profile
         ProfileScreen.route: (context) => ProfileScreen(),
 
         // home user
-        HomeUserScreen.route: (context) => HomeUserScreen(),
+        HomeUserScreen.route: (context) => const HomeUserScreen(),
 
         // task detail
         // TaskDetailScreen.route: (context) => TaskDetailScreen(),
