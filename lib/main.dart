@@ -26,7 +26,7 @@ class MyApp extends AppMVC {
         LoginScreen.route: (context) => const LoginScreen(),
 
         // profile
-        ProfileScreen.route: (context) => ProfileScreen(),
+        // ProfileScreen.route: (context) => ProfileScreen(),
 
         // home user
         HomeUserScreen.route: (context) => const HomeUserScreen(),

@@ -13,6 +13,7 @@ class MyPopupDialog extends StatelessWidget {
     this.confirmText,
     this.confirmTap,
     this.confirmType,
+    this.isLoading = false,
   }) : super(key: key);
 
   final double height;
@@ -25,6 +26,7 @@ class MyPopupDialog extends StatelessWidget {
   final String? confirmText;
   final void Function()? confirmTap;
   final MyButtonType? confirmType;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +34,8 @@ class MyPopupDialog extends StatelessWidget {
       type: MaterialType.transparency,
       child: Center(
         child: Container(
-          height: this.height,
-          width: this.width,
+          height: height,
+          width: width,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: kWhite,
@@ -45,32 +47,35 @@ class MyPopupDialog extends StatelessWidget {
             children: [
               Center(
                 child: Text(
-                  this.title,
-                  style: TextStyle(
+                  title,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   MyButton(
-                    this.cancelText ?? "Tidak",
-                    width: this.buttonWidth ?? this.width / 3.5,
-                    type: this.cancelType ?? MyButtonType.danger,
+                    cancelText ?? "Tidak",
+                    width: buttonWidth ?? width / 3.5,
+                    type: cancelType ?? MyButtonType.danger,
                     size: MyButtonSize.sm,
-                    onTap: this.cancelTap,
+                    disabled: isLoading,
+                    onTap: cancelTap,
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   MyButton(
-                    this.confirmText ?? "Ya",
-                    width: this.buttonWidth ?? this.width / 3.5,
-                    type: this.confirmType ?? MyButtonType.primary,
+                    confirmText ?? "Ya",
+                    width: buttonWidth ?? width / 3.5,
+                    type: confirmType ?? MyButtonType.primary,
                     size: MyButtonSize.sm,
-                    onTap: this.confirmTap,
+                    disabled: isLoading,
+                    loading: isLoading,
+                    onTap: confirmTap,
                   ),
                 ],
               ),

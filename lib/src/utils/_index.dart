@@ -4,6 +4,7 @@ export 'helpers/get_current_position.dart';
 
 // Services
 export 'services/auth.dart';
+export 'services/firestore/_index.dart';
 
 // UI
 export 'ui/my_app_bar.dart';

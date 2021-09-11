@@ -60,7 +60,7 @@ class _HomeAdminScreenState extends State<HomeAdminScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return ProfileScreen(name: "");
+                    return ProfileScreen(uid: "");
                   },
                 ),
               );

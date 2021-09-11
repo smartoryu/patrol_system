@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:nusalima_patrol_system/src/models.dart';
+import 'package:nusalima_patrol_system/src/utils/_index.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -44,16 +45,30 @@ class AuthService {
   }
 
   // register with email & password
-  Future<UserModel?> registerWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
+  Future<UserModel?> registerWithEmailAndPassword({
+    required String email,
+    required String password,
+    required String fullName,
+    required String phoneNumber,
+    required String role,
+    required String position,
+  }) async {
     try {
       var result = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
       User? user = result.user;
+
+      await DatabaseService().users.set(
+            uid: user?.uid,
+            email: email,
+            password: password,
+            fullName: fullName,
+            phoneNumber: phoneNumber,
+            role: role,
+            position: position,
+          );
       return _userFromFirebase(user);
     } catch (e) {
       rethrow;
