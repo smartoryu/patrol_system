@@ -1,9 +1,14 @@
 import 'package:nusalima_patrol_system/src/screens/home_user/views/components/header.dart';
+import 'package:nusalima_patrol_system/src/models.dart';
 import 'package:nusalima_patrol_system/src/views.dart';
 
 class HomeAdminScreen extends StatefulWidget {
-  static const route = "/home-admin-screen";
-  HomeAdminScreen({Key? key}) : super(key: key);
+  const HomeAdminScreen({
+    Key? key,
+    required this.officer,
+  }) : super(key: key);
+
+  final Officer officer;
 
   @override
   _HomeAdminScreenState createState() => _HomeAdminScreenState();
@@ -12,7 +17,7 @@ class HomeAdminScreen extends StatefulWidget {
 class _HomeAdminScreenState extends State<HomeAdminScreen> {
   int selectedIndex = 0;
 
-  List<Widget> _screenOptions = <Widget>[
+  final List<Widget> _screenOptions = <Widget>[
     HomeTodayScreen(),
     HomeReportScreen(),
     HomeSettingScreen(),
@@ -24,8 +29,8 @@ class _HomeAdminScreenState extends State<HomeAdminScreen> {
       appBar: myAppBarMinimal(brightness: Brightness.light),
       backgroundColor: kPrimary,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: this.selectedIndex,
-        onTap: (index) => setState(() => this.selectedIndex = index),
+        currentIndex: selectedIndex,
+        onTap: (index) => setState(() => selectedIndex = index),
         iconSize: 20,
         selectedFontSize: 12,
         unselectedFontSize: 12,
@@ -34,7 +39,7 @@ class _HomeAdminScreenState extends State<HomeAdminScreen> {
         backgroundColor: kWhite,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
-        items: <BottomNavigationBarItem>[
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             label: "Jadwal Aktif",
             icon: NavigationIcon(Icons.account_circle),
@@ -52,21 +57,20 @@ class _HomeAdminScreenState extends State<HomeAdminScreen> {
       body: Column(
         children: [
           HomeUserHeader(
-            username: "Olivia Yew",
-            phoneNumber: "+62821334334123",
+            username: widget.officer.fullName,
+            phoneNumber: widget.officer.phoneNumber,
             onTapEditProfile: () {
-              // Navigator.pushNamed(context, ProfileScreen.route);
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return ProfileScreen(uid: "");
+                    return ProfileScreen(uid: widget.officer.uid);
                   },
                 ),
               );
             },
           ),
-          _screenOptions.elementAt(this.selectedIndex),
+          _screenOptions.elementAt(selectedIndex),
         ],
       ),
     );

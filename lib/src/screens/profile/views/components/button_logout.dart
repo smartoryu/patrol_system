@@ -23,6 +23,7 @@ class ProfileButtonLogout extends StatelessWidget {
               confirmText: "Ya",
               confirmType: MyButtonType.danger,
               confirmTap: () {
+                AuthService().signOut();
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   LoginScreen.route,

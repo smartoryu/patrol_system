@@ -1,3 +1,4 @@
+import 'package:nusalima_patrol_system/src/models.dart';
 import 'package:nusalima_patrol_system/src/views.dart';
 
 import 'components/date_selector.dart';
@@ -5,8 +6,12 @@ import 'components/header.dart';
 import 'components/task_item.dart';
 
 class HomeUserScreen extends StatefulWidget {
-  static const route = "/home-user-screen";
-  const HomeUserScreen({Key? key}) : super(key: key);
+  const HomeUserScreen({
+    Key? key,
+    required this.officer,
+  }) : super(key: key);
+
+  final Officer officer;
 
   @override
   _HomeUserScreenState createState() => _HomeUserScreenState();
@@ -37,18 +42,25 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
       body: Column(
         children: [
           HomeUserHeader(
-            username: "Olive Yew",
-            phoneNumber: "+62821334334123",
+            username: widget.officer.fullName,
+            phoneNumber: widget.officer.phoneNumber,
             // photo: this._photo,
             onTapEditProfile: () {
-              Navigator.pushNamed(context, ProfileScreen.route);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return ProfileScreen(uid: widget.officer.uid);
+                  },
+                ),
+              );
             },
             onTapAlert: () {},
           ),
           HomeUserDateSelector(
             // today: DateTime(2021, 8, 15),
             onChangeDate: (date) {
-              print(date.toUtc().toIso8601String());
+              debugPrint(date.toUtc().toIso8601String());
             },
           ),
           Expanded(
@@ -56,7 +68,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: kWhite,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
                 ),
@@ -65,7 +77,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
                 padding: const EdgeInsets.all(16.0),
                 itemCount: _dummy.length,
                 separatorBuilder: (ctx, i) {
-                  return SizedBox(height: 16);
+                  return const SizedBox(height: 16);
                 },
                 itemBuilder: (ctx, i) {
                   var item = _dummy[i];

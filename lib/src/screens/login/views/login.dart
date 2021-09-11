@@ -127,7 +127,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
                     MyButton(
                       "Login",
+                      loading: isLoading,
+                      disabled: isLoading,
                       onTap: () async {
+                        _formKey.currentState!.validate();
+
                         try {
                           requestStart();
                           // var result = await _auth.signInAnon();
@@ -140,15 +144,26 @@ class _LoginScreenState extends State<LoginScreen> {
                             debugPrint("erorr signing in");
                           } else {
                             debugPrint("signed in");
-                            print(result);
-                          }
 
-                          _formKey.currentState!.validate();
-
-                          if (this.email == "admin@mail.com") {
-                            Navigator.pushNamed(context, HomeAdminScreen.route);
-                          } else if (this.email == "user@mail.com") {
-                            Navigator.pushNamed(context, HomeUserScreen.route);
+                            if (result.role == "admin") {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return HomeAdminScreen(officer: result);
+                                  },
+                                ),
+                              );
+                            } else if (result.role == "officer") {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) {
+                                    return HomeUserScreen(officer: result);
+                                  },
+                                ),
+                              );
+                            }
                           }
                         } catch (e) {
                           String errMsg = e.toString();

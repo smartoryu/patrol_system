@@ -1,7 +1,7 @@
 import 'dart:async';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:nusalima_patrol_system/src/models.dart';
 import 'package:nusalima_patrol_system/src/views.dart';
-import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
   static const route = "/splash-screen";
@@ -12,22 +12,48 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  FirebaseAuth auth = FirebaseAuth.instance;
+  late StreamSubscription<User?> _sub;
+
   @override
   void initState() {
     super.initState();
-    _loadWidget();
+
+    Timer(const Duration(seconds: 2), () async {
+      _sub = auth.authStateChanges().listen((user) async {
+        var officer = await DatabaseService().users.getSingle(user?.uid ?? "");
+
+        debugPrint("USER $user");
+        debugPrint("OFFICER $officer");
+
+        if (officer?.role == "officer") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeUserScreen(officer: officer!),
+            ),
+          );
+        } else if (officer?.role == "admin") {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeAdminScreen(officer: officer!),
+            ),
+          );
+        } else {
+          Navigator.pushReplacementNamed(
+            context,
+            LoginScreen.route,
+          );
+        }
+      });
+    });
   }
 
-  void _loadWidget() async {
-    // final user = Provider.of<UserModel>(context);
-    // print(user);
-    
-    Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(
-        context,
-        LoginScreen.route,
-      );
-    });
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
   }
 
   @override

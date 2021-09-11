@@ -7,20 +7,29 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // create user obj based on User
-  UserModel? _userFromFirebase(User? user) {
-    return user != null ? UserModel(uid: user.uid) : null;
+  Future<Officer?> _userFromFirebase(User? user) async {
+    if (user != null) {
+      var officer = await DatabaseService().users.getSingle(user.uid);
+      return officer;
+    } else {
+      return null;
+    }
+    // return user != null ? UserModel(uid: user.uid) : null;
   }
 
   // auth change user stream
-  Stream<UserModel?> get user =>
-      _auth.authStateChanges().map(_userFromFirebase);
+  Stream<Future<Officer?>> get user => _auth.authStateChanges().map((e) {
+        var officer = _userFromFirebase(e);
+        return officer;
+      });
 
   // sign in anon
-  Future<UserModel?> signInAnon() async {
+  Future<Officer?> signInAnon() async {
     try {
       var result = await _auth.signInAnonymously();
       User? user = result.user;
-      return _userFromFirebase(user);
+      var officer = await _userFromFirebase(user);
+      return officer;
     } catch (e) {
       debugPrint(e.toString());
       return null;
@@ -28,7 +37,7 @@ class AuthService {
   }
 
   // sign in with email & password
-  Future<UserModel?> signInWithEmailAndPassword(
+  Future<Officer?> signInWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -38,14 +47,15 @@ class AuthService {
         password: password,
       );
       User? user = result.user;
-      return _userFromFirebase(user);
+      var officer = await _userFromFirebase(user);
+      return officer;
     } catch (e) {
       rethrow;
     }
   }
 
   // register with email & password
-  Future<UserModel?> registerWithEmailAndPassword({
+  Future<Officer?> registerWithEmailAndPassword({
     required String email,
     required String password,
     required String fullName,
@@ -69,7 +79,8 @@ class AuthService {
             role: role,
             position: position,
           );
-      return _userFromFirebase(user);
+      var officer = await _userFromFirebase(user);
+      return officer;
     } catch (e) {
       rethrow;
     }

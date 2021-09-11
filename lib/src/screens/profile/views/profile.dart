@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nusalima_patrol_system/src/models.dart';
 import 'package:nusalima_patrol_system/src/views.dart';
 
@@ -33,7 +32,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           statusBarIconBrightness: Brightness.light,
         ),
         actions: [
-          if (widget.isEditing) const ProfileButtonLogout(),
+          if (!widget.isEditing) const ProfileButtonLogout(),
         ],
       ),
       body: FutureBuilder<Officer?>(

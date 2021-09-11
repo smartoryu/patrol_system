@@ -29,7 +29,7 @@ class MyApp extends AppMVC {
         // ProfileScreen.route: (context) => ProfileScreen(),
 
         // home user
-        HomeUserScreen.route: (context) => const HomeUserScreen(),
+        // HomeUserScreen.route: (context) => const HomeUserScreen(),
 
         // task detail
         // TaskDetailScreen.route: (context) => TaskDetailScreen(),
@@ -38,7 +38,7 @@ class MyApp extends AppMVC {
         UserReportFormScreen.route: (context) => UserReportFormScreen(),
 
         // home admin
-        HomeAdminScreen.route: (context) => HomeAdminScreen(),
+        // HomeAdminScreen.route: (context) => HomeAdminScreen(),
 
         // daftar petugas
         DaftarPetugasScreen.route: (context) => DaftarPetugasScreen(),
