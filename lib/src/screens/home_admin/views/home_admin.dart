@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nusalima_patrol_system/src/screens/home_user/views/components/header.dart';
 import 'package:nusalima_patrol_system/src/models.dart';
 import 'package:nusalima_patrol_system/src/views.dart';
@@ -17,14 +20,25 @@ class HomeAdminScreen extends StatefulWidget {
 class _HomeAdminScreenState extends State<HomeAdminScreen> {
   int selectedIndex = 0;
 
-  final List<Widget> _screenOptions = <Widget>[
-    HomeTodayScreen(),
-    HomeReportScreen(),
-    HomeSettingScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _screenOptions = <Widget>[
+      HomeTodayScreen(),
+      HomeReportScreen(),
+      HomeSettingScreen(uid: widget.officer.uid),
+    ];
+
+    void _handleEdit() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return ProfileScreen(uid: widget.officer.uid);
+          },
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: myAppBarMinimal(brightness: Brightness.light),
       backgroundColor: kPrimary,
@@ -56,17 +70,31 @@ class _HomeAdminScreenState extends State<HomeAdminScreen> {
       ),
       body: Column(
         children: [
-          HomeUserHeader(
-            username: widget.officer.fullName,
-            phoneNumber: widget.officer.phoneNumber,
-            onTapEditProfile: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return ProfileScreen(uid: widget.officer.uid);
-                  },
-                ),
+          StreamBuilder<DocumentSnapshot<Object?>>(
+            stream: DatabaseService(uid: widget.officer.uid).users.getCurrent,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                debugPrint(snapshot.error.toString());
+                return const Text("Network Error");
+              }
+              if (snapshot.hasData) {
+                var json = jsonDecode(jsonEncode(snapshot.data!.data()));
+                Officer? item;
+                if (json != null) {
+                  item = Officer.fromJson(json);
+                }
+
+                return HomeUserHeader(
+                  phoneNumber: item?.phoneNumber ?? "",
+                  username: item?.fullName ?? "",
+                  photo: item?.photo ?? "",
+                  isLoading: item == null,
+                  onTapEditProfile: _handleEdit,
+                );
+              }
+              return HomeUserHeader(
+                isLoading: true,
+                onTapEditProfile: _handleEdit,
               );
             },
           ),

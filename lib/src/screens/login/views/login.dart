@@ -171,9 +171,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           if (errMsg.contains("user-disabled")) {
                             requestFailed("Account Disabled");
                           } else if (errMsg.contains("wrong-password")) {
-                            requestFailed("Wrong Password");
+                            requestFailed("Password salah");
                           } else if (errMsg.contains("user-not-found")) {
-                            requestFailed("Email not registered");
+                            requestFailed("Email Tidak Terdaftar");
+                          } else if (errMsg.contains("invalid-email")) {
+                            requestFailed("Email Tidak Valid");
                           } else {
                             requestFailed("Server Failed");
                           }

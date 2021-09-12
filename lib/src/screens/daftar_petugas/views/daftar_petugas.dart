@@ -7,8 +7,14 @@ import 'package:nusalima_patrol_system/src/views.dart';
 import 'daftar_petugas_form.dart';
 
 class DaftarPetugasScreen extends StatefulWidget {
-  static const route = "/daftar-petugas-screen";
-  const DaftarPetugasScreen({Key? key}) : super(key: key);
+  const DaftarPetugasScreen({
+    Key? key,
+    required this.role,
+    this.uid = "",
+  }) : super(key: key);
+
+  final String role;
+  final String uid;
 
   @override
   _DaftarPetugasScreenState createState() => _DaftarPetugasScreenState();
@@ -58,7 +64,9 @@ class _DaftarPetugasScreenState extends State<DaftarPetugasScreen> {
           statusBarColor: kPrimary,
           statusBarIconBrightness: Brightness.light,
         ),
-        title: const Text("Daftar Petugas"),
+        title: widget.role == "admin"
+            ? const Text("Daftar Admin")
+            : const Text("Daftar Petugas"),
         actions: [
           Center(
             child: MyButton(
@@ -68,7 +76,10 @@ class _DaftarPetugasScreenState extends State<DaftarPetugasScreen> {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const DaftarPetugasForm(),
+                  builder: (context) => DaftarPetugasForm(
+                    role: widget.role,
+                    uid: widget.uid,
+                  ),
                 ),
               ),
             ),
@@ -91,15 +102,10 @@ class _DaftarPetugasScreenState extends State<DaftarPetugasScreen> {
             List<Officer> officers = [];
             for (var e in snapshot.data!.docs) {
               var json = e.data();
-              officers.add(
-                Officer.fromJson(
-                  jsonDecode(
-                    jsonEncode(
-                      json,
-                    ),
-                  ),
-                ),
-              );
+              var item = Officer.fromJson(jsonDecode(jsonEncode(json)));
+              if (item.role == widget.role && item.uid != widget.uid) {
+                officers.add(item);
+              }
             }
 
             return ListView.separated(
@@ -125,7 +131,10 @@ class _DaftarPetugasScreenState extends State<DaftarPetugasScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) {
-                                    return ProfileScreen(uid: item.uid);
+                                    return ProfileScreen(
+                                      uid: item.uid,
+                                      type: "admin",
+                                    );
                                   },
                                 ),
                               );

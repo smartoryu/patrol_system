@@ -41,7 +41,7 @@ class MyApp extends AppMVC {
         // HomeAdminScreen.route: (context) => HomeAdminScreen(),
 
         // daftar petugas
-        DaftarPetugasScreen.route: (context) => DaftarPetugasScreen(),
+        // DaftarPetugasScreen.route: (context) => DaftarPetugasScreen(),
 
         // daftar lokasi
         DaftarLokasiScreen.route: (context) => DaftarLokasiScreen(),

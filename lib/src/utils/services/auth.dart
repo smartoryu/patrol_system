@@ -7,28 +7,50 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // create user obj based on User
-  Future<Officer?> _userFromFirebase(User? user) async {
-    if (user != null) {
-      var officer = await DatabaseService().users.getSingle(user.uid);
-      return officer;
-    } else {
-      return null;
+  UserModel? _userFromFirebase(User? user) {
+    return user != null ? UserModel(uid: user.uid) : null;
+  }
+
+  // change email
+  Future changeEmail(String _email, String _password) async {
+    var user = _auth.currentUser;
+    if (user == null) return;
+
+    var email = user.email ?? "";
+
+    try {
+      await signInWithEmailAndPassword(email, _password);
+      await user.updateEmail(_email);
+    } catch (e) {
+      rethrow;
     }
-    // return user != null ? UserModel(uid: user.uid) : null;
+  }
+
+  // change password
+  Future changePassword(String _oldPassword, String _newPassword) async {
+    var user = _auth.currentUser;
+    if (user == null) return;
+
+    var email = user.email ?? "";
+
+    try {
+      await signInWithEmailAndPassword(email, _oldPassword);
+      await user.updatePassword(_newPassword);
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // auth change user stream
-  Stream<Future<Officer?>> get user => _auth.authStateChanges().map((e) {
-        var officer = _userFromFirebase(e);
-        return officer;
-      });
+  Stream<UserModel?> get user =>
+      _auth.authStateChanges().map(_userFromFirebase);
 
   // sign in anon
-  Future<Officer?> signInAnon() async {
+  Future signInAnon() async {
     try {
       var result = await _auth.signInAnonymously();
       User? user = result.user;
-      var officer = await _userFromFirebase(user);
+      var officer = _userFromFirebase(user);
       return officer;
     } catch (e) {
       debugPrint(e.toString());
@@ -47,7 +69,7 @@ class AuthService {
         password: password,
       );
       User? user = result.user;
-      var officer = await _userFromFirebase(user);
+      var officer = await DatabaseService().users.getSingle(user?.uid ?? "");
       return officer;
     } catch (e) {
       rethrow;
@@ -55,12 +77,13 @@ class AuthService {
   }
 
   // register with email & password
-  Future<Officer?> registerWithEmailAndPassword({
+  Future registerWithEmailAndPassword({
     required String email,
     required String password,
     required String fullName,
     required String phoneNumber,
     required String role,
+    required String officerId,
     required String position,
   }) async {
     try {
@@ -75,12 +98,13 @@ class AuthService {
             email: email,
             password: password,
             fullName: fullName,
+            officerId: officerId,
             phoneNumber: phoneNumber,
-            role: role,
             position: position,
+            role: role,
           );
-      var officer = await _userFromFirebase(user);
-      return officer;
+      // var officer = await DatabaseService().users.getSingle(user?.uid ?? "");
+      // return officer;
     } catch (e) {
       rethrow;
     }

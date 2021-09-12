@@ -1,4 +1,6 @@
+import 'package:nusalima_patrol_system/src/models.dart';
 import 'package:nusalima_patrol_system/src/views.dart';
+import 'package:provider/provider.dart';
 
 class HomeUserHeader extends StatelessWidget {
   const HomeUserHeader({
@@ -6,8 +8,9 @@ class HomeUserHeader extends StatelessWidget {
     this.onTapAlert,
     this.onTapEditProfile,
     this.photo = "",
-    required this.phoneNumber,
-    required this.username,
+    this.phoneNumber = "",
+    this.username = "",
+    this.isLoading = false,
   }) : super(key: key);
 
   final void Function()? onTapAlert;
@@ -15,9 +18,11 @@ class HomeUserHeader extends StatelessWidget {
   final String photo;
   final String phoneNumber;
   final String username;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
+    
     return Padding(
       padding: const EdgeInsets.fromLTRB(30, 25, 30, 25),
       child: Row(
@@ -28,13 +33,15 @@ class HomeUserHeader extends StatelessWidget {
               width: 75,
               height: 75,
               color: kPrimary2,
-              child: this.photo == ""
+              child: photo == ""
                   ? Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: FittedBox(
                         fit: BoxFit.contain,
                         child: Text(
-                          Format.nameToInitial(this.username),
+                          isLoading
+                              ? "loading..."
+                              : Format.nameToInitial(username),
                           style: TextStyle(
                             color: kSecondary2,
                             fontWeight: FontWeight.bold,
@@ -42,12 +49,12 @@ class HomeUserHeader extends StatelessWidget {
                         ),
                       ),
                     )
-                  : Image.network(this.photo),
+                  : Image.network(photo),
             ),
           ),
 
           //
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           //
 
           Expanded(
@@ -55,17 +62,17 @@ class HomeUserHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  this.username,
+                  isLoading ? "loading..." : username,
                   style: TextStyle(color: kWhite, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  this.phoneNumber,
+                  isLoading ? "loading..." : phoneNumber,
                   style: TextStyle(color: kWhite),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 GestureDetector(
-                  onTap: this.onTapEditProfile,
+                  onTap: onTapEditProfile,
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
@@ -87,12 +94,12 @@ class HomeUserHeader extends StatelessWidget {
 
           //
 
-          if (this.onTapAlert != null)
+          if (onTapAlert != null)
             Material(
               color: fromRGB("#F4F2F2"),
               borderRadius: BorderRadius.circular(8),
               child: InkWell(
-                onTap: this.onTapAlert,
+                onTap: onTapAlert,
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
                   height: 50,
@@ -109,7 +116,7 @@ class HomeUserHeader extends StatelessWidget {
                         color: kDanger,
                         size: 28,
                       ),
-                      Text("ALERT", style: TextStyle(fontSize: 12)),
+                      const Text("ALERT", style: TextStyle(fontSize: 12)),
                     ],
                   ),
                 ),
