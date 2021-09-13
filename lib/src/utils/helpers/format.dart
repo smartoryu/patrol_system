@@ -5,7 +5,7 @@ class Format {
   ///
   /// example: 150.000
   static String quantity(dynamic number) {
-    NumberFormat formatCurrency = new NumberFormat.currency(
+    NumberFormat formatCurrency = NumberFormat.currency(
       locale: 'id_ID',
       symbol: "",
       decimalDigits: 0,

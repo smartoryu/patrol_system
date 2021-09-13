@@ -1,4 +1,5 @@
 import 'location_collection.dart';
+import 'shift_collection.dart';
 import 'user_collection.dart';
 
 class DatabaseService {
@@ -11,5 +12,9 @@ class DatabaseService {
 
   LocationCollection get locations {
     return LocationCollection(uid: uid);
+  }
+
+  ShiftCollection get shifts {
+    return ShiftCollection(uid: uid);
   }
 }

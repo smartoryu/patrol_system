@@ -77,15 +77,15 @@ class _HomeSettingScreenState extends State<HomeSettingScreen> {
                 },
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: HomeSettingItem(
-                "Daftar Waktu Shift",
-                onTap: () {
-                  Navigator.pushNamed(context, DaftarWaktuScreen.route);
-                },
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(top: 16.0),
+            //   child: HomeSettingItem(
+            //     "Daftar Waktu Shift",
+            //     onTap: () {
+            //       Navigator.pushNamed(context, DaftarWaktuScreen.route);
+            //     },
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.only(top: 32.0),
               child: HomeSettingItem(
