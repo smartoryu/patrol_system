@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nusalima_patrol_system/src/models.dart';
@@ -43,21 +45,31 @@ class UserCollection {
     }
   }
 
-  Future set({
-    String? uid = "",
-    required String fullName,
+  Future create({
     required String email,
     required String password,
+    required String fullName,
     required String phoneNumber,
     required String role,
     String officerId = "",
     required String position,
   }) async {
+    FirebaseApp tempApp = await Firebase.initializeApp(
+      name: 'temporaryRegister',
+      options: Firebase.app().options,
+    );
+
     try {
-      if (uid == "") throw "Invalid UID";
+      var auth = FirebaseAuth.instanceFor(app: tempApp);
+      var result = await auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
       var time = DateTime.now().toUtc().toIso8601String();
-      return await collection.doc(uid).set({
-        'uid': uid,
+
+      await collection.doc(result.user?.uid).set({
+        'uid': result.user?.uid,
         'fullName': fullName,
         'email': email,
         'officerId': officerId,
@@ -68,8 +80,11 @@ class UserCollection {
         'createdAt': time,
         'updatedAt': time,
       });
+
+      await tempApp.delete();
+      return "OK";
     } catch (e) {
-      rethrow;
+      return null;
     }
   }
 

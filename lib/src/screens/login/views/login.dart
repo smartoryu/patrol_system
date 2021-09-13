@@ -146,22 +146,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             debugPrint("signed in");
 
                             if (result.role == "admin") {
-                              Navigator.push(
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) {
                                     return HomeAdminScreen(officer: result);
                                   },
                                 ),
+                                (_) => false,
                               );
                             } else if (result.role == "officer") {
-                              Navigator.push(
+                              Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) {
                                     return HomeUserScreen(officer: result);
                                   },
                                 ),
+                                (_) => false,
                               );
                             }
                           }

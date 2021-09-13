@@ -87,22 +87,23 @@ class AuthService {
     required String position,
   }) async {
     try {
-      var result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      User? user = result.user;
+      // var result = await _auth.createUserWithEmailAndPassword(
+      //   email: email,
+      //   password: password,
+      // );
+      // User? user = result.user;
 
-      await DatabaseService().users.set(
-            uid: user?.uid,
-            email: email,
-            password: password,
-            fullName: fullName,
-            officerId: officerId,
-            phoneNumber: phoneNumber,
-            position: position,
-            role: role,
-          );
+      // await DatabaseService().users.set(
+      //       uid: user?.uid,
+      //       email: email,
+      //       password: password,
+      //       fullName: fullName,
+      //       officerId: officerId,
+      //       phoneNumber: phoneNumber,
+      //       position: position,
+      //       role: role,
+      //     );
+
       // var officer = await DatabaseService().users.getSingle(user?.uid ?? "");
       // return officer;
     } catch (e) {

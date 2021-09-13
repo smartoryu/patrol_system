@@ -209,7 +209,7 @@ class _DaftarPetugasFormState extends State<DaftarPetugasForm> {
                               throw "Nomor tidak valid.";
                             }
 
-                            await AuthService().registerWithEmailAndPassword(
+                            await DatabaseService().users.create(
                               email: email,
                               password: password,
                               fullName: fullName,
@@ -225,6 +225,7 @@ class _DaftarPetugasFormState extends State<DaftarPetugasForm> {
                             // handleBack();
                           } catch (error) {
                             var e = error.toString();
+                            print(e);
                             if (e.contains("invalid-email")) {
                               requestFailed("Format email salah");
                             } else if (e.contains("weak-password")) {
