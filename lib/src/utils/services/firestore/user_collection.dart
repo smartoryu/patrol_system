@@ -28,7 +28,7 @@ class UserCollection {
     required Map<String, dynamic> json,
   }) async {
     try {
-      json["updatedAt"] = DateTime.now().toIso8601String();
+      json["updatedAt"] = DateTime.now().toUtc().toIso8601String();
       await collection.doc(uid).update(json);
     } catch (e) {
       rethrow;
@@ -55,7 +55,7 @@ class UserCollection {
   }) async {
     try {
       if (uid == "") throw "Invalid UID";
-      var time = DateTime.now().toIso8601String();
+      var time = DateTime.now().toUtc().toIso8601String();
       return await collection.doc(uid).set({
         'uid': uid,
         'fullName': fullName,
