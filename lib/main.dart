@@ -44,7 +44,7 @@ class MyApp extends AppMVC {
         // DaftarPetugasScreen.route: (context) => DaftarPetugasScreen(),
 
         // daftar lokasi
-        DaftarLokasiScreen.route: (context) => DaftarLokasiScreen(),
+        DaftarLokasiScreen.route: (context) => const DaftarLokasiScreen(),
 
         // daftar waktu
         DaftarWaktuScreen.route: (context) => DaftarWaktuScreen(),

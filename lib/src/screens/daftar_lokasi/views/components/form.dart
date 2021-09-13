@@ -1,18 +1,13 @@
+import 'package:nusalima_patrol_system/src/models.dart';
 import 'package:nusalima_patrol_system/src/views.dart';
 
 class DaftarLokasiForm extends StatefulWidget {
-  DaftarLokasiForm({
+  const DaftarLokasiForm({
     Key? key,
-    required this.width,
-    this.buttonWidth,
-    this.onConfirm,
-    this.value,
+    this.isEditing,
   }) : super(key: key);
 
-  final double width;
-  final double? buttonWidth;
-  final void Function(String)? onConfirm;
-  final String? value;
+  final Location? isEditing;
 
   @override
   _DaftarLokasiFormState createState() => _DaftarLokasiFormState();
@@ -21,28 +16,46 @@ class DaftarLokasiForm extends StatefulWidget {
 class _DaftarLokasiFormState extends State<DaftarLokasiForm> {
   TextEditingController conText = TextEditingController();
   String text = "";
+  void setText(String e) => setState(() => text = e);
+
+  String error = "";
+  bool loading = false;
+  void requestStart() => setState(() {
+        error = "";
+        loading = true;
+      });
+  void requestDone([String e = ""]) => setState(() {
+        error = e;
+        loading = false;
+      });
 
   @override
   void initState() {
     super.initState();
 
-    if (this.widget.value != null) {
-      conText.text = this.widget.value!;
-      setState(() => this.text = this.widget.value!);
+    if (widget.isEditing != null) {
+      conText.text = widget.isEditing!.name;
+      text = widget.isEditing!.name;
+      setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    var _size = MediaQuery.of(context).size;
+    var _width = _size.width - 64;
+    var _height = 200.0;
+
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: Material(
         type: MaterialType.transparency,
         child: Center(
           child: Container(
-            height: 200,
-            width: this.widget.width,
+            height: _height,
+            width: _width,
             padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: 200),
             decoration: BoxDecoration(
               color: kWhite,
               borderRadius: BorderRadius.circular(8),
@@ -53,40 +66,66 @@ class _DaftarLokasiFormState extends State<DaftarLokasiForm> {
               children: [
                 Center(
                   child: Text(
-                    this.widget.value == null ? "Tambah Baru" : "Edit",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    widget.isEditing == null
+                        ? "Tambah Baru"
+                        : "Edit Nama Lokasi",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 TextField(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "Masukkan nama lokasi",
                   ),
-                  onChanged: (value) {
-                    setState(() => this.text = value);
-                  },
-                  controller: this.conText,
+                  textAlign: TextAlign.center,
+                  controller: conText,
+                  onChanged: setText,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     MyButton(
                       "Batal",
-                      width: this.widget.width / 3.5,
+                      width: _width / 3.5,
+                      disabled: loading,
                       type: MyButtonType.primaryOutline,
                       size: MyButtonSize.sm,
                       onTap: Navigator.of(context).pop,
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     MyButton(
                       "Simpan",
-                      width: this.widget.width / 3.5,
+                      width: _width / 3.5,
+                      disabled: text == "" || loading,
+                      loading: loading,
                       type: MyButtonType.primary,
                       size: MyButtonSize.sm,
-                      onTap: this.widget.onConfirm == null
-                          ? null
-                          : () => this.widget.onConfirm!(text),
+                      onTap: () async {
+                        if (text == "") return;
+                        try {
+                          requestStart();
+
+                          if (widget.isEditing == null) {
+                            await DatabaseService()
+                                .locations
+                                .create(name: text);
+                          } else {
+                            await DatabaseService(uid: widget.isEditing!.uid)
+                                .locations
+                                .update(json: {"name": text});
+                          }
+                          requestDone();
+
+                          Navigator.of(context).pop();
+                        } catch (e) {
+                          var errMsg = e.toString();
+                          requestDone(errMsg);
+                        }
+                      },
                     ),
                   ],
                 ),

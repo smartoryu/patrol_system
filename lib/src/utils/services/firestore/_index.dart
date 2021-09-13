@@ -1,3 +1,4 @@
+import 'location_collection.dart';
 import 'user_collection.dart';
 
 class DatabaseService {
@@ -6,5 +7,9 @@ class DatabaseService {
 
   UserCollection get users {
     return UserCollection(uid: uid);
+  }
+
+  LocationCollection get locations {
+    return LocationCollection(uid: uid);
   }
 }
