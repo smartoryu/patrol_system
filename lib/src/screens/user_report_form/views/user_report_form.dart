@@ -86,6 +86,7 @@ class _UserReportFormScreenState extends State<UserReportFormScreen> {
 
       setState(() => loading = false);
       Navigator.pop(context);
+      Navigator.pop(context);
     }
 
     Future<void> handleBack() async {

@@ -10,19 +10,14 @@ import 'components/content_item.dart';
 import 'components/opposite_content_item.dart';
 
 class TaskDetailScreen extends StatefulWidget {
-  static const route = "/task-detail-screen";
   const TaskDetailScreen({
     Key? key,
-    this.uid = "",
-    this.time = "",
-    this.location = "",
-    this.isDone = false,
-    this.isAdmin = false,
+    required this.item,
+    required this.isDone,
+    required this.isAdmin,
   }) : super(key: key);
 
-  final String uid;
-  final String time;
-  final String location;
+  final Shift item;
   final bool isDone;
   final bool isAdmin;
 
@@ -31,33 +26,42 @@ class TaskDetailScreen extends StatefulWidget {
 }
 
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
+  List<ShiftReport> reports = [];
+  bool loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    setState(() => loading = true);
+    try {
+      var result = await FirebaseFirestore.instance
+          .collection("shift_report")
+          .where('shiftId', isEqualTo: widget.item.uid)
+          .get();
+
+      reports = [];
+
+      for (var e in result.docs) {
+        var json = e.data();
+        var item = ShiftReport.fromJson(jsonDecode(jsonEncode(json)));
+        reports.add(item);
+      }
+      setState(() {});
+      setState(() => loading = false);
+    } catch (e) {
+      setState(() => loading = false);
+      debugPrint(e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    var _note =
-        "Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...";
-
-    final List<TaskDetailModel> dummy = [
-      TaskDetailModel(
-        createdAt: "23.15",
-        notes: _note,
-        photos: [
-          "https://images.unsplash.com/photo-1621866568420-9bf4a508c062?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8a2VidW58ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
-          "https://images.unsplash.com/photo-1576403575366-786274ee7a50?ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8a2VidW58ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
-          "https://images.unsplash.com/photo-1615796000240-c0b7cd3d385f?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fGtlYnVufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
-        ],
-      ),
-      TaskDetailModel(
-        createdAt: "23.01",
-        notes: _note,
-        photos: [
-          "https://images.unsplash.com/photo-1615648178124-01f7162ceac4?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTl8fGtlYnVufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
-          "https://images.unsplash.com/photo-1615648178124-01f7162ceac4?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        ],
-      ),
-    ];
-
     return StreamBuilder<DocumentSnapshot<Object?>>(
-        stream: DatabaseService(uid: widget.uid).shifts.getCurrent,
+        stream: DatabaseService(uid: widget.item.uid).shifts.getCurrent,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             debugPrint(snapshot.error.toString());
@@ -94,22 +98,62 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     ),
                   ],
                 ),
-                actions: [
-                  if (!widget.isAdmin && widget.isDone)
-                    const TaskDetailButtonSelesaikanShift()
-                  else
-                    const SizedBox(width: 8),
-                  const SizedBox(width: 8),
-                ],
               ),
               floatingActionButton: !widget.isAdmin
-                  ? null
-                  : FloatingActionButton.extended(
+                  ? widget.item.isDone
+                      ? null
+                      : FloatingActionButton.extended(
+                          label: const Text('Selesaikan Shift'),
+                          icon: const Icon(Icons.task_alt),
+                          backgroundColor: kDanger,
+                          onPressed: () {
+                            _showPopup() => showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    var _size = MediaQuery.of(context).size;
+                                    var _width = _size.width - 64;
+                                    return MyPopupDialog(
+                                      title: "Yakin selesaikan shift?",
+                                      height: 120,
+                                      width: _width,
+                                      buttonWidth: _width / 3,
+                                      cancelText: "Tidak",
+                                      cancelType: MyButtonType.primaryOutline,
+                                      cancelTap: Navigator.of(context).pop,
+                                      confirmText: "Ya",
+                                      isLoading: loading,
+                                      confirmTap: () async {
+                                        try {
+                                          setState(() => loading = true);
+                                          DatabaseService(
+                                            uid: widget.item.uid,
+                                          ).shifts.update(
+                                            json: {"isDone": true},
+                                          );
+
+                                          setState(() => loading = false);
+                                          Navigator.of(context)
+                                            ..pop()
+                                            ..pop();
+                                        } catch (e) {
+                                          debugPrint(e.toString());
+                                          setState(() => loading = false);
+                                        }
+                                      },
+                                    );
+                                  },
+                                );
+
+                            _showPopup();
+                          },
+                        )
+                  : reports.isEmpty ? null : FloatingActionButton.extended(
                       label: const Text('Lihat Rute Jaga'),
                       icon: const Icon(Icons.navigation),
                       backgroundColor: kDanger,
                       onPressed: () {
                         Future<void> _handleLaunchMap() async {
+                          setState(() => loading = true);
                           _launchURL(String url) async {
                             if (await canLaunch(url)) {
                               await launch(url);
@@ -123,24 +167,22 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                           var baseUrl = "https://www.google.com/maps/dir";
                           var position = "${pos.latitude},${pos.longitude}";
 
-                          var base = [
-                            baseUrl,
-                            "-6.3095561,106.6775224",
-                            "-6.3098492,106.6770244",
-                            "-6.3107685,106.6770161",
-                            "-6.311245,106.678152",
-                            "-6.3108108,106.678875",
-                            "-6.310334,106.678834",
-                            "-6.309774,106.678507",
-                            "-6.3092222,106.6781635",
-                            "-6.3095561,106.6775224",
-                            //
-                            position,
-                          ];
+                          var gps = reports.map((e) {
+                            return "${e.lat},${e.long}";
+                          }).toList();
+
+                          var base = [baseUrl];
+                          for (var e in gps) {
+                            base.add(e);
+                          }
+                          base.add(position);
 
                           var _url = base.join("/");
 
+                          debugPrint("$_url&mode=walking");
+
                           _launchURL("$_url&mode=walking");
+                          setState(() => loading = false);
                         }
 
                         _showPopup() => showDialog(
@@ -166,75 +208,86 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                         // _addNewShift();
                       },
                     ),
-              body: SingleChildScrollView(
-                child: FixedTimeline.tileBuilder(
-                  builder: TimelineTileBuilder.connectedFromStyle(
-                    contentsAlign: ContentsAlign.basic,
-                    oppositeContentsBuilder: (context, index) {
-                      if (index == 0 && !widget.isDone) {
-                        return null;
-                      } else {
-                        var _item = widget.isDone || widget.isAdmin
-                            ? dummy[index]
-                            : dummy[index - 1];
-                        return TaskDetailOppositeContentItem(
-                          child: Text(
-                            _item.createdAt,
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        );
-                      }
-                    },
-                    contentsBuilder: (context, index) {
-                      if (index == 0 && !widget.isDone && !widget.isAdmin) {
-                        return Card(
-                          color: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: MyButton(
-                              "Buat Laporan Baru",
-                              type: MyButtonType.primary2,
-                              onTap: () {
-                                if (item == null) return;
-
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) {
-                                    return UserReportFormScreen(
-                                      shiftId: item!.uid,
-                                      location: item.location,
-                                      officer: item.officer,
-                                    );
-                                  }),
-                                  // UserReportFormScreen.route,
-                                );
-                              },
+              body: RefreshIndicator(
+                onRefresh: fetchData,
+                child: SingleChildScrollView(
+                  child: FixedTimeline.tileBuilder(
+                    builder: TimelineTileBuilder.connectedFromStyle(
+                      contentsAlign: ContentsAlign.basic,
+                      oppositeContentsBuilder: (context, index) {
+                        if (index == 0 && !widget.isDone) {
+                          return null;
+                        } else {
+                          var _item = widget.isDone || widget.isAdmin
+                              ? reports[index]
+                              : reports[index - 1];
+                          return TaskDetailOppositeContentItem(
+                            child: Text(
+                              Format.date(_item.createdAt, "HH:mm"),
+                              style: const TextStyle(fontSize: 16),
                             ),
-                          ),
-                        );
-                      } else {
-                        var _item = widget.isDone || widget.isAdmin
-                            ? dummy[index]
-                            : dummy[index - 1];
-                        return TaskDetailContentItem(
-                          notes: _item.notes,
-                          photos: _item.photos,
-                        );
-                      }
-                    },
-                    nodePositionBuilder: (context, _) => 0.2,
-                    indicatorPositionBuilder: (context, _) => 0.5,
-                    connectorStyleBuilder: (context, index) =>
-                        ConnectorStyle.solidLine,
-                    firstConnectorStyle: ConnectorStyle.transparent,
-                    lastConnectorStyle: ConnectorStyle.transparent,
-                    indicatorStyleBuilder: (context, index) =>
-                        IndicatorStyle.dot,
-                    itemCount: widget.isDone || widget.isAdmin
-                        ? dummy.length
-                        : dummy.length + 1,
-                    itemExtent: 125,
+                          );
+                        }
+                      },
+                      contentsBuilder: (context, index) {
+                        if (index == 0 && !widget.isDone && !widget.isAdmin) {
+                          // var nowIso = DateTime.now().toUtc().toIso8601String();
+                          // var createdAt = widget.item.createdAt;
+                          // var now = Format.date(nowIso, "dd-MM-yyyy");
+                          // var current = Format.date(createdAt, "dd-MM-yyyy");
+
+                          return Card(
+                            color: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: MyButton(
+                                "Buat Laporan Baru",
+                                // disabled: now != current,
+                                type: MyButtonType.primary2,
+                                onTap: () {
+                                  if (item == null) return;
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) {
+                                      return UserReportFormScreen(
+                                        shiftId: item!.uid,
+                                        location: item.location,
+                                        officer: item.officer,
+                                      );
+                                    }),
+                                    // UserReportFormScreen.route,
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        } else {
+                          var _item = widget.isDone || widget.isAdmin
+                              ? reports[index]
+                              : reports[index - 1];
+
+                          return TaskDetailContentItem(
+                            notes: _item.notes,
+                            photos: _item.photos,
+                          );
+                        }
+                      },
+                      nodePositionBuilder: (context, _) => 0.2,
+                      indicatorPositionBuilder: (context, _) => 0.5,
+                      connectorStyleBuilder: (context, index) {
+                        return ConnectorStyle.solidLine;
+                      },
+                      firstConnectorStyle: ConnectorStyle.transparent,
+                      lastConnectorStyle: ConnectorStyle.transparent,
+                      indicatorStyleBuilder: (context, index) =>
+                          IndicatorStyle.dot,
+                      itemCount: widget.isDone || widget.isAdmin
+                          ? reports.length
+                          : reports.length + 1,
+                      itemExtent: 125,
+                    ),
                   ),
                 ),
               ),

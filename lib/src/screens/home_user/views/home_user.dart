@@ -25,6 +25,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
   Officer? user;
   List<Shift> shifts = [];
   List<Shift> filtered = [];
+  bool loading = false;
 
   DateTime date = DateTime.now();
   setDate(DateTime e) => setState(() => date = e);
@@ -44,6 +45,7 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
   }
 
   Future<void> fetchData(DateTime _date) async {
+    setState(() => loading = true);
     final FirebaseAuth auth = FirebaseAuth.instance;
     final User? user = auth.currentUser;
     final uid = user?.uid;
@@ -71,12 +73,9 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
 
     setDate(_date);
     setState(() => filtered = today);
+    setState(() => loading = false);
     // filterByDate(DateTime.now(), shifts);
   }
-
-  // ignore: unused_field
-  final _photo =
-      "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80";
 
   @override
   Widget build(BuildContext context) {
@@ -119,32 +118,36 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
                   topRight: Radius.circular(16),
                 ),
               ),
-              child: ListView.separated(
-                padding: const EdgeInsets.all(16.0),
-                itemCount: filtered.length,
-                separatorBuilder: (ctx, i) {
-                  return const SizedBox(height: 16);
-                },
-                itemBuilder: (ctx, i) {
-                  var item = filtered[i];
-                  return HomeUserTaskItem(
-                    location: item.location.name,
-                    startTime: item.startTime,
-                    endTime: item.endTime,
-                    isDone: item.isDone,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return TaskDetailScreen(
-                            uid: item.uid,
-                            isDone: item.isDone,
-                          );
-                        }),
-                      );
-                    },
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: () => fetchData(date),
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(16.0),
+                  itemCount: filtered.length,
+                  separatorBuilder: (ctx, i) {
+                    return const SizedBox(height: 16);
+                  },
+                  itemBuilder: (ctx, i) {
+                    var item = filtered[i];
+                    return HomeUserTaskItem(
+                      location: item.location.name,
+                      startTime: item.startTime,
+                      endTime: item.endTime,
+                      isDone: item.isDone,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return TaskDetailScreen(
+                              item: item,
+                              isDone: item.isDone,
+                              isAdmin: false,
+                            );
+                          }),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           )

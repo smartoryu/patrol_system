@@ -28,6 +28,7 @@ class _HomeTodayScreenState extends State<HomeTodayScreen> {
   }
 
   Future<void> fetchData() async {
+    setState(() => shifts = []);
     var result = await FirebaseFirestore.instance.collection("shifts").get();
     for (var e in result.docs) {
       var json = e.data();
@@ -72,32 +73,35 @@ class _HomeTodayScreenState extends State<HomeTodayScreen> {
                   topRight: Radius.circular(16),
                 ),
               ),
-              child: ListView.separated(
-                padding: const EdgeInsets.all(16.0),
-                itemCount: filtered.length,
-                separatorBuilder: (ctx, i) => const SizedBox(height: 16),
-                itemBuilder: (ctx, i) {
-                  var item = filtered[i];
-                  return HomeAdminTaskItem(
-                    officer: item.officer.fullName,
-                    location: item.location.name,
-                    startTime: item.startTime,
-                    endTime: item.endTime,
-                    isDone: item.isDone,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return TaskDetailScreen(
-                            uid: item.uid,
-                            isDone: item.isDone,
-                            isAdmin: true,
-                          );
-                        }),
-                      );
-                    },
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: fetchData,
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(16.0),
+                  itemCount: filtered.length,
+                  separatorBuilder: (ctx, i) => const SizedBox(height: 16),
+                  itemBuilder: (ctx, i) {
+                    var item = filtered[i];
+                    return HomeAdminTaskItem(
+                      officer: item.officer.fullName,
+                      location: item.location.name,
+                      startTime: item.startTime,
+                      endTime: item.endTime,
+                      isDone: item.isDone,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return TaskDetailScreen(
+                              item: item,
+                              isDone: item.isDone,
+                              isAdmin: true,
+                            );
+                          }),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ),

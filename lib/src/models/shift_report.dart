@@ -1,36 +1,42 @@
 import 'package:nusalima_patrol_system/src/models.dart';
 
-class Shift {
+class ShiftReport {
   final String uid;
+  final String shiftId;
   final Officer officer;
   final Location location;
-  final String startTime;
-  final String endTime;
+  final String notes;
+  final List<String> photos;
+  final String lat;
+  final String long;
   final String createdAt;
   final String updatedAt;
-  final bool isDone;
 
-  Shift({
+  ShiftReport({
     required this.uid,
+    required this.shiftId,
     required this.officer,
     required this.location,
-    required this.startTime,
-    required this.endTime,
+    required this.notes,
+    required this.photos,
+    required this.lat,
+    required this.long,
     required this.createdAt,
     required this.updatedAt,
-    required this.isDone,
   });
 
-  factory Shift.fromJson(Map<String, dynamic> json) {
-    return Shift(
+  factory ShiftReport.fromJson(Map<String, dynamic> json) {
+    return ShiftReport(
       uid: json['uid'],
+      shiftId: json['shiftId'],
       officer: Officer.fromJson(json['officer']),
       location: Location.fromJson(json['location']),
-      startTime: json['startTime'],
-      endTime: json['endTime'],
+      notes: json['notes'],
+      photos: json['photos'].cast<String>(),
+      lat: json['lat'],
+      long: json['long'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
-      isDone: json['isDone'] ?? false,
     );
   }
 }

@@ -32,6 +32,7 @@ class _HomeReportScreenState extends State<HomeReportScreen> {
 
   Future<void> fetchData() async {
     var result = await FirebaseFirestore.instance.collection("shifts").get();
+    setState(() => shifts = []);
     for (var e in result.docs) {
       var json = e.data();
       var item = Shift.fromJson(jsonDecode(jsonEncode(json)));
@@ -77,32 +78,35 @@ class _HomeReportScreenState extends State<HomeReportScreen> {
                   topRight: Radius.circular(16),
                 ),
               ),
-              child: ListView.separated(
-                padding: const EdgeInsets.all(16.0),
-                itemCount: filtered.length,
-                separatorBuilder: (ctx, i) => const SizedBox(height: 16),
-                itemBuilder: (ctx, i) {
-                  var item = filtered[i];
-                  return HomeAdminTaskItem(
-                    officer: item.officer.fullName,
-                    location: item.location.name,
-                    startTime: item.startTime,
-                    endTime: item.endTime,
-                    isDone: item.isDone,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return TaskDetailScreen(
-                            uid: item.uid,
-                            isDone: true,
-                            isAdmin: true,
-                          );
-                        }),
-                      );
-                    },
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: fetchData,
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(16.0),
+                  itemCount: filtered.length,
+                  separatorBuilder: (ctx, i) => const SizedBox(height: 16),
+                  itemBuilder: (ctx, i) {
+                    var item = filtered[i];
+                    return HomeAdminTaskItem(
+                      officer: item.officer.fullName,
+                      location: item.location.name,
+                      startTime: item.startTime,
+                      endTime: item.endTime,
+                      isDone: item.isDone,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return TaskDetailScreen(
+                              item: item,
+                              isDone: true,
+                              isAdmin: true,
+                            );
+                          }),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ),
