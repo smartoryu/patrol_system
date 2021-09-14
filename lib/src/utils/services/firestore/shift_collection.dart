@@ -36,6 +36,7 @@ class ShiftCollection {
         "endTime": endTime.toUtc().toIso8601String(),
         "createdAt": time,
         "updatedAt": time,
+        "isDone": false,
       });
     } catch (e) {
       rethrow;
@@ -59,6 +60,7 @@ class ShiftCollection {
           "endTime": shift.endTime.toUtc().toIso8601String(),
           "createdAt": time,
           "updatedAt": time,
+          "isDone": false,
         });
       }
 
