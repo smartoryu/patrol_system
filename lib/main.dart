@@ -35,7 +35,7 @@ class MyApp extends AppMVC {
         // TaskDetailScreen.route: (context) => TaskDetailScreen(),
 
         // user report form
-        UserReportFormScreen.route: (context) => UserReportFormScreen(),
+        // UserReportFormScreen.route: (context) => UserReportFormScreen(),
 
         // home admin
         // HomeAdminScreen.route: (context) => HomeAdminScreen(),
@@ -47,10 +47,10 @@ class MyApp extends AppMVC {
         DaftarLokasiScreen.route: (context) => const DaftarLokasiScreen(),
 
         // daftar waktu
-        DaftarWaktuScreen.route: (context) => DaftarWaktuScreen(),
+        // DaftarWaktuScreen.route: (context) => DaftarWaktuScreen(),
 
         // buat jadwal
-        BuatJadwalScreen.route: (context) => BuatJadwalScreen(),
+        BuatJadwalScreen.route: (context) => const BuatJadwalScreen(),
       },
     );
   }

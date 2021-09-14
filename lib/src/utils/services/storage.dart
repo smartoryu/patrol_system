@@ -8,11 +8,12 @@ class StorageService {
   Future<String> upload({
     required String fileName,
     required File file,
+    required String category,
   }) async {
     try {
       var timestamp = DateTime.now().millisecondsSinceEpoch;
       Reference ref =
-          storage.ref().child("profile").child("${fileName}_$timestamp");
+          storage.ref().child(category).child("${fileName}_$timestamp");
       UploadTask uploadTask = ref.putFile(file);
 
       var downloadURL = await (await uploadTask).ref.getDownloadURL();
@@ -27,6 +28,16 @@ class StorageService {
     try {
       if (url == "") return;
       await storage.refFromURL(url).delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future deleteBulkByUrl({required List<String> urls}) async {
+    try {
+      await Future.forEach(urls, (String url) async {
+        await storage.refFromURL(url).delete();
+      });
     } catch (e) {
       rethrow;
     }

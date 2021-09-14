@@ -119,12 +119,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                             }
                           }
 
-                          var position = await getCurrentPosition();
-                          var _lat = position.latitude;
-                          var _lon = position.longitude;
+                          var pos = await getCurrentPosition();
+                          var baseUrl = "https://www.google.com/maps/dir";
+                          var position = "${pos.latitude},${pos.longitude}";
 
                           var base = [
-                            "https://www.google.com/maps/dir",
+                            baseUrl,
                             "-6.3095561,106.6775224",
                             "-6.3098492,106.6770244",
                             "-6.3107685,106.6770161",
@@ -135,7 +135,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                             "-6.3092222,106.6781635",
                             "-6.3095561,106.6775224",
                             //
-                            "$_lat,$_lon",
+                            position,
                           ];
 
                           var _url = base.join("/");
@@ -195,10 +195,21 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                             child: MyButton(
                               "Buat Laporan Baru",
                               type: MyButtonType.primary2,
-                              onTap: () => Navigator.pushNamed(
-                                context,
-                                UserReportFormScreen.route,
-                              ),
+                              onTap: () {
+                                if (item == null) return;
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) {
+                                    return UserReportFormScreen(
+                                      shiftId: item!.uid,
+                                      location: item.location,
+                                      officer: item.officer,
+                                    );
+                                  }),
+                                  // UserReportFormScreen.route,
+                                );
+                              },
                             ),
                           ),
                         );

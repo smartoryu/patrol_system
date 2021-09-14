@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:nusalima_patrol_system/src/models.dart';
 import 'package:uuid/uuid.dart';
 
-class ShiftCollection {
+class ShiftReportCollection {
   final String uid;
-  ShiftCollection({this.uid = ""});
+  ShiftReportCollection({this.uid = ""});
 
   final CollectionReference collection =
-      FirebaseFirestore.instance.collection("shifts");
+      FirebaseFirestore.instance.collection("shift_report");
 
   Stream<QuerySnapshot> get getAll {
     return collection.snapshots();
@@ -18,52 +18,30 @@ class ShiftCollection {
   }
 
   Future create({
-    required String name,
+    required String shiftId,
     required Officer officer,
     required Location location,
-    required DateTime startTime,
-    required DateTime endTime,
+    required String notes,
+    required List<String> photos,
+    required String lat,
+    required String long,
   }) async {
     try {
       var time = DateTime.now().toUtc().toIso8601String();
       var uid = const Uuid().v4();
+
       return await collection.doc(uid).set({
         "uid": uid,
+        "shiftId": shiftId,
         "officer": officer.toJson(),
         "location": location.toJson(),
-        "startTime": startTime.toUtc().toIso8601String(),
-        "endTime": endTime.toUtc().toIso8601String(),
+        "notes": notes,
+        "photos": photos,
+        "lat": lat,
+        "long": long,
         "createdAt": time,
         "updatedAt": time,
-        "isDone": false,
       });
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future createBulk(List<NewShift> shifts) async {
-    try {
-      var db = FirebaseFirestore.instance;
-      var batch = db.batch();
-
-      for (var shift in shifts) {
-        var time = DateTime.now().toUtc().toIso8601String();
-        var uid = const Uuid().v4();
-
-        batch.set(db.collection("shifts").doc(uid), {
-          "uid": uid,
-          "officer": shift.officer.toJson(),
-          "location": shift.location.toJson(),
-          "startTime": shift.startTime.toUtc().toIso8601String(),
-          "endTime": shift.endTime.toUtc().toIso8601String(),
-          "createdAt": time,
-          "updatedAt": time,
-          "isDone": false,
-        });
-      }
-
-      return await batch.commit();
     } catch (e) {
       rethrow;
     }

@@ -110,6 +110,7 @@ class UserCollection {
       var downloadURL = await StorageService().upload(
         fileName: fileName,
         file: file,
+        category: "profile",
       );
 
       debugPrint(downloadURL);

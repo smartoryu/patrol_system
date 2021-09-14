@@ -1,3 +1,5 @@
+import 'package:nusalima_patrol_system/src/utils/services/firestore/shift_report_collection.dart';
+
 import 'location_collection.dart';
 import 'shift_collection.dart';
 import 'user_collection.dart';
@@ -16,5 +18,9 @@ class DatabaseService {
 
   ShiftCollection get shifts {
     return ShiftCollection(uid: uid);
+  }
+
+  ShiftReportCollection get shiftReport {
+    return ShiftReportCollection(uid: uid);
   }
 }
