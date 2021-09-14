@@ -6,20 +6,22 @@ class HomeUserTaskItem extends StatelessWidget {
     this.isDone = false,
     required this.location,
     this.onTap,
-    required this.time,
+    required this.startTime,
+    required this.endTime,
   }) : super(key: key);
 
   final bool isDone;
   final String location;
   final void Function()? onTap;
-  final String time;
+  final String startTime;
+  final String endTime;
 
   @override
   Widget build(BuildContext context) {
     return Material(
       color: kWhite,
       child: InkWell(
-        onTap: this.onTap,
+        onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Container(
           padding: const EdgeInsets.all(8.0),
@@ -31,31 +33,31 @@ class HomeUserTaskItem extends StatelessWidget {
             children: [
               SizedBox(
                 width: 40,
-                child: this.isDone
-                    ? Icon(Icons.assignment_turned_in, size: 32)
-                    : Icon(Icons.assignment_turned_in_outlined, size: 32),
+                child: isDone
+                    ? const Icon(Icons.assignment_turned_in, size: 32)
+                    : const Icon(Icons.assignment_turned_in_outlined, size: 32),
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      this.time,
-                      style: TextStyle(
+                      "${Format.date(startTime, "dd/MM/yyyy")} | ${Format.date(startTime, "HH.mm")} - ${Format.date(endTime, "HH.mm")}",
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      this.location,
-                      style: TextStyle(
+                      location,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(width: 32, child: Icon(Icons.navigate_next)),
+              const SizedBox(width: 32, child: Icon(Icons.navigate_next)),
             ],
           ),
         ),
