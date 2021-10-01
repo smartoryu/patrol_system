@@ -50,6 +50,11 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         var item = ShiftReport.fromJson(jsonDecode(jsonEncode(json)));
         reports.add(item);
       }
+      reports.sort((a,b) {
+        var adate = a.createdAt;
+        var bdate = b.createdAt;
+        return bdate.compareTo(adate);
+      });
       setState(() {});
       setState(() => loading = false);
     } catch (e) {
@@ -60,6 +65,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("ITEM ${reports.map((e) => Format.date(e.createdAt, 'HH:mm'))}");
+
     return StreamBuilder<DocumentSnapshot<Object?>>(
         stream: DatabaseService(uid: widget.item.uid).shifts.getCurrent,
         builder: (context, snapshot) {
@@ -147,67 +154,69 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                             _showPopup();
                           },
                         )
-                  : reports.isEmpty ? null : FloatingActionButton.extended(
-                      label: const Text('Lihat Rute Jaga'),
-                      icon: const Icon(Icons.navigation),
-                      backgroundColor: kDanger,
-                      onPressed: () {
-                        Future<void> _handleLaunchMap() async {
-                          setState(() => loading = true);
-                          _launchURL(String url) async {
-                            if (await canLaunch(url)) {
-                              await launch(url);
-                              Navigator.of(context).pop();
-                            } else {
-                              throw 'Could not launch $url';
+                  : reports.isEmpty
+                      ? null
+                      : FloatingActionButton.extended(
+                          label: const Text('Lihat Rute Jaga'),
+                          icon: const Icon(Icons.navigation),
+                          backgroundColor: kDanger,
+                          onPressed: () {
+                            Future<void> _handleLaunchMap() async {
+                              setState(() => loading = true);
+                              _launchURL(String url) async {
+                                if (await canLaunch(url)) {
+                                  await launch(url);
+                                  Navigator.of(context).pop();
+                                } else {
+                                  throw 'Could not launch $url';
+                                }
+                              }
+
+                              var pos = await getCurrentPosition();
+                              var baseUrl = "https://www.google.com/maps/dir";
+                              var position = "${pos.latitude},${pos.longitude}";
+
+                              var gps = reports.map((e) {
+                                return "${e.lat},${e.long}";
+                              }).toList();
+
+                              var base = [baseUrl];
+                              for (var e in gps) {
+                                base.add(e);
+                              }
+                              base.add(position);
+
+                              var _url = base.join("/");
+
+                              debugPrint("$_url&mode=walking");
+
+                              _launchURL("$_url&mode=walking");
+                              setState(() => loading = false);
                             }
-                          }
 
-                          var pos = await getCurrentPosition();
-                          var baseUrl = "https://www.google.com/maps/dir";
-                          var position = "${pos.latitude},${pos.longitude}";
-
-                          var gps = reports.map((e) {
-                            return "${e.lat},${e.long}";
-                          }).toList();
-
-                          var base = [baseUrl];
-                          for (var e in gps) {
-                            base.add(e);
-                          }
-                          base.add(position);
-
-                          var _url = base.join("/");
-
-                          debugPrint("$_url&mode=walking");
-
-                          _launchURL("$_url&mode=walking");
-                          setState(() => loading = false);
-                        }
-
-                        _showPopup() => showDialog(
-                              context: context,
-                              builder: (context) {
-                                var _size = MediaQuery.of(context).size;
-                                var _width = _size.width - 64;
-                                return MyPopupDialog(
-                                  title: "Ingin melihat rute jaga petugas?",
-                                  height: 120,
-                                  width: _width,
-                                  buttonWidth: _width / 3,
-                                  cancelText: "Tidak",
-                                  cancelType: MyButtonType.primaryOutline,
-                                  cancelTap: Navigator.of(context).pop,
-                                  confirmText: "Ya",
-                                  confirmTap: _handleLaunchMap,
+                            _showPopup() => showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    var _size = MediaQuery.of(context).size;
+                                    var _width = _size.width - 64;
+                                    return MyPopupDialog(
+                                      title: "Ingin melihat rute jaga petugas?",
+                                      height: 120,
+                                      width: _width,
+                                      buttonWidth: _width / 3,
+                                      cancelText: "Tidak",
+                                      cancelType: MyButtonType.primaryOutline,
+                                      cancelTap: Navigator.of(context).pop,
+                                      confirmText: "Ya",
+                                      confirmTap: _handleLaunchMap,
+                                    );
+                                  },
                                 );
-                              },
-                            );
 
-                        _showPopup();
-                        // _addNewShift();
-                      },
-                    ),
+                            _showPopup();
+                            // _addNewShift();
+                          },
+                        ),
               body: RefreshIndicator(
                 onRefresh: fetchData,
                 child: SingleChildScrollView(
