@@ -65,7 +65,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("ITEM ${reports.map((e) => Format.date(e.createdAt, 'HH:mm'))}");
+    debugPrint("ITEM ${reports.map((e) => Format.date(e.createdAt, 'HH:mm'))}");
 
     return StreamBuilder<DocumentSnapshot<Object?>>(
         stream: DatabaseService(uid: widget.item.uid).shifts.getCurrent,
@@ -220,6 +220,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               body: RefreshIndicator(
                 onRefresh: fetchData,
                 child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 75),
                   child: FixedTimeline.tileBuilder(
                     builder: TimelineTileBuilder.connectedFromStyle(
                       contentsAlign: ContentsAlign.basic,
@@ -295,7 +296,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       itemCount: widget.isDone || widget.isAdmin
                           ? reports.length
                           : reports.length + 1,
-                      itemExtent: 125,
+                      itemExtent: 130,
                     ),
                   ),
                 ),

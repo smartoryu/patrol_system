@@ -21,10 +21,9 @@ class TaskDetailContentItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              children: this.photos.isEmpty
+              children: photos.isEmpty
                   ? <Widget>[]
-                  : this
-                      .photos
+                  : photos
                       .asMap()
                       .map((index, item) {
                         return MapEntry(
@@ -62,12 +61,12 @@ class TaskDetailContentItem extends StatelessWidget {
                       .values
                       .toList(),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
-              'Catatan: ${this.notes}',
+              'Catatan: $notes',
               overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-              style: TextStyle(fontSize: 14),
+              maxLines: 3,
+              style: const TextStyle(fontSize: 14),
             ),
           ],
         ),
