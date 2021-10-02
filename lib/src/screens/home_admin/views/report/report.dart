@@ -18,15 +18,15 @@ class _HomeReportScreenState extends State<HomeReportScreen> {
   List<Shift> shifts = [];
   List<Shift> filtered = [];
 
-  DateTime date = DateTime.now();
+  DateTime date = DateTime.now().subtract(const Duration(days: 1));
   setDate(DateTime e) => setState(() => date = e);
 
   @override
   void initState() {
     super.initState();
-    var dt = DateTime.now();
-    var _yesterday = DateTime(dt.year, dt.month, dt.day - 1, 0, 0, 0);
-    setDate(_yesterday);
+    // var dt = DateTime.now();
+    // var _yesterday = DateTime(dt.year, dt.month, dt.day - 1, 0, 0, 0);
+    // setDate(_yesterday);
     fetchData();
   }
 
@@ -56,6 +56,7 @@ class _HomeReportScreenState extends State<HomeReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("===== REPORT: $date");
     return Expanded(
       child: Column(
         children: [

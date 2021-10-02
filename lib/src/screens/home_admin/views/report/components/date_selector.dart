@@ -14,16 +14,17 @@ class HomeReportDateSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var _today = DateTime.now();
-    var _yesterday = DateTime(_today.year, _today.month, _today.day - 1);
-    var _firstDate = DateTime(_today.year - 1, _today.month, _today.day);
+    var _today = DateTime.now().subtract(const Duration(days: 1));
+    // var _yesterday = DateTime(_today.year, _today.month, _today.day - 1);
+    var _firstDate = DateTime(today.year - 1, today.month, today.day);
 
+    debugPrint("REPORT TODAY: $today");
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: CalendarTimeline(
         initialDate: today,
         firstDate: _firstDate,
-        lastDate: _yesterday,
+        lastDate: _today,
         onDateSelected: (date) {
           onChangeDate(date);
         },
