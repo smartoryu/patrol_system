@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:nusalima_patrol_system/src/models.dart';
 import 'package:nusalima_patrol_system/src/views.dart';
 
@@ -44,7 +45,32 @@ class _UserReportFormScreenState extends State<UserReportFormScreen> {
           );
           if (image != null) {
             String fileName = "profile";
-            File file = File(image.path);
+
+            Future<File> compressFile(File file) async {
+              try {
+                final filePath = file.absolute.path;
+
+                final lastIndex = filePath.lastIndexOf(RegExp(r'.jp'));
+                final splitted = filePath.substring(0, (lastIndex));
+                final outPath =
+                    "${splitted}_out${filePath.substring(lastIndex)}";
+
+                var result = await FlutterImageCompress.compressAndGetFile(
+                  file.absolute.path,
+                  outPath,
+                  quality: 80,
+                );
+
+                debugPrint("FILE ${file.lengthSync() / 1000}Kb");
+                debugPrint("RESULT ${result!.lengthSync() / 1000}Kb");
+
+                return result;
+              } catch (e) {
+                rethrow;
+              }
+            }
+
+            File file = await compressFile(File(image.path));
 
             var downloadURL = await StorageService().upload(
               fileName: fileName,

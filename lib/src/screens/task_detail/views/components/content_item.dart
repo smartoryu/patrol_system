@@ -30,6 +30,7 @@ class TaskDetailContentItem extends StatelessWidget {
                           index,
                           GestureDetector(
                             onTap: () {
+                              debugPrint(item);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
